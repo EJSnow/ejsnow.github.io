@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<!--
+	Linear by TEMPLATED
+    templated.co @templatedco
+    Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+		<title>Booting Windows 7 in pure UEFI (no CSM)</title>
+		<link rel="icon" type="image/png" sizes="32x32" href="../../images/favicon-32px.png">
+		<link rel="icon" type="image/png" sizes="24x24" href="../../images/favicon-24px.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="../../images/favicon-16px.png">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script src="../../js/skel.min.js"></script>
+		<script src="../../js/skel-panels.min.js"></script>
+		<script src="../../js/init.js"></script>
+		<link rel="preload" href="../../css/font/NotoSans-Light.woff2" as="font" type="font/woff2" crossorigin>
+		<link rel="preload" href="../../css/font/NotoSans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+		<style>
+			ul.bullet {
+				display: block;
+				list-style-type: disc;
+				margin-block-start: 1em;
+				margin-block-end: 1em;
+				margin-inline-start: 0px;
+				margin-inline-end: 0px;
+				padding-inline-start: 30px;
+				unicode-bidi: isolate;
+			}
+			ol.numbered {
+				display: block;
+				list-style-type: decimal;
+				margin-block-start: 1em;
+				margin-block-end: 1em;
+				margin-inline-start: 0px;
+				margin-inline-end: 0px;
+				padding-inline-start: 30px;
+				unicode-bidi: isolate;
+			}
+		</style>
+		<link rel="stylesheet" href="../../css/skel-noscript.css">
+		<link rel="stylesheet" href="../../css/style.css">
+		<link rel="stylesheet" href="../../css/style-desktop.css">
+	</head>
+	<body>
+	<!-- Header -->
+		<div id="header">
+			<div id="nav-wrapper"> 
+				<!-- Nav -->
+				<nav id="nav"><ul><li><a href="../../index.html">Home</a></li>
+						<li><a href="../../projects.html">My Projects</a></li>
+						<li class="active"><a href="../../things.html">Other things</a></li>
+					</ul></nav></div>
+			<div class="container"> 
+				
+				<!-- Logo -->
+				<div id="logo">
+					<h1>Windows</h1>
+					<span class="tag">Things you can do with Windows</span>
+				</div>
+			</div>
+		</div>
+	<!-- Main -->
+		<div id="main">
+			<div id="content" class="container">
+				<section>
+					<header>
+						<h2>Booting Windows 7 in pure UEFI (no CSM)</h2>
+						<span class="byline"><i>Yes, this is what you think it is...</i></span>
+					</header>
+					<p>Windows 7 doesn't boot on 99% of UEFI systems that <i>don't</i> have CSM (legacy BIOS) support or have it disabled. Microsoft just didn't feel like implementing proper UEFI support back in 2009, because it was not that common yet. Now apparently some UEFI-only computers <i>can</i> still boot Windows 7, but those computers are few and far between. For almost all systems, you need to modify your installation for Windows 7 to boot without CSM. This is one way of doing it, and this way should work on most computers.</p>
+					<h2 id="prerequisites"><a href="#prerequisites">Prerequisites and things to note</a></h2>
+					<p><b>IMPORTANT</b>: Please read this guide thoroughly before attempting this on an actual Windows 7 installation. This will require knowing how to perform a clean installation of Windows, basic Command Prompt knowledge, knowing how to get into your computer's BIOS and will involve modifying important system files. If you don't follow all the steps properly, you may break your installation, so READ THE INSTRUCTIONS, and don't say I didn't warn you.</p>
+					<p>With that out of the way, here's what you will need to pull this off:</p>
+					<ul class="bullet">
+						<li>A Windows 7 installer/full installation, and a Windows 7-compatible graphics driver for your computer's hardware. If you can't find one, stop reading this guide now.</li>
+						<li>A Windows 8/10 installer to pull system files from. (And, if your system doesn't support CSM, to install Windows 7. See <a href="install-windows-manually">this guide</a>.)</li>
+						<li>2 8 GB or higher capacity USB drives, one for your Win7 installer, and one for your Win8/10 installer. Alternatively, you can use a single 16 GB or higher capacity drive, install <a href="https://ventoy.net">Ventoy</a> to it, and place both the Windows 7 and 8/10 ISOs on the drive.</li>
+					</ul>
+					<p>A quick guide to flashing an ISO image to a thumb drive in Windows for those unfamiliar:</p>
+					<ol class="numbered">
+						<li>Download the latest version of <a href="https://rufus.ie">Rufus</a>.</li>
+						<li>Plug the thumb drive into your computer, then open Rufus. Select "No" when asked to enable automatic updates.</li>
+						<li>Ensure the correct drive is selected, then click SELECT and locate your ISO image.</li>
+						<li><b>WARNING: This step will erase your thumb drive.</b> Click START, and accept the warning about data destruction.</li>
+					</ol>
+					<p>Now that you have everything you need, follow the instructions below.</p>
+					<h2 id="install-windows-7"><a href="#install-windows-7">Install Windows 7</a></h2>
+					<p>You will need CSM enabled in the BIOS in order to boot the Windows 7 installer, so ensure it's on before starting installation. Jump down to <a href="#no-csm">here</a> if your system doesn't support CSM.</p>
+					<p>Install Windows 7 as you normally would (boot the installer, then follow the onscreen prompts to install Windows). Once you get to the desktop, get all your drivers, <i><b>especially your graphics driver</b></i> installed. Usually, after installing the graphics driver, you will get the Aero Glass effect. Once you have internet access, install all available updates. Then, continue below.</p>
+					<h2 id="editing-registry-and-boot-config"><a href="#editing-registry-and-boot-config">Editing the registry and boot configuration</a></h2>
+					<p>You will need to make a few small registry edits and modify the boot configuration slightly now.</p>
+					<h3 id="editing-registry"><a href="#editing-registry">Registry editing</a></h3>
+					<p>Open up Registry Editor, and navigate to the following key:<br><code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services</code></p>
+					<p>Under this key, find the <code>Vga</code> key. In that key, set the <code>Start</code> value to <code>4</code>. Then find the <code>VgaSave</code> key, which should be right under <code>Vga</code>. Set the <code>Start</code> value to <code>4</code>, as before. Close Registry Editor.</p>
+					<h3 id="editing-boot-config"><a href="#editing-boot-config">Modifying the boot configuration</a></h3>
+					<p>Open an administrative Command Prompt. Execute the following commands:</p>
+					<pre>
+						<code>
+bcdedit /set {current} bootlog yes
+bcdedit /set {current} bootstatuspolicy IgnoreAllFailures
+bcdedit /set {current} novesa on
+						</code>
+					</pre>
+					<p>All of them should say "operation completed successfully". Skip to <a href="#replace-system-files">here</a> as the next section is for when you don't have CSM support on your computer.</p>
+					<h2 id="no-csm"><a href="#no-csm">If your computer doesn't support CSM, follow these steps instead</a></h2>
+					<p>If your computer doesn't support CSM, you will have to use a tool like <a href="https://www.ntlite.com">NTLite</a> to preinstall your graphics driver and perform the registry edits above. I recommend preinstalling all the rest of your drivers as well, it will make your life easier. You will also need a Windows 8/10 installer to perform the initial installation. After preinstalling your graphics driver, copy <code>install.wim</code> from the <code>sources</code> folder on your modified Windows 7 ISO to the thumb drive with your Windows 8/10 installer on it.</p>
+					<p>Now, boot the Windows 8/10 installer, and manually install Windows 7 from Command Prompt in the installer.</p>
+					<p>Afterwards, do not reboot. In your Command Prompt, run this command: <code>bcdedit</code><br>It will show you a list of entries in the Windows bootloader. Find the one that says "Windows 7" and copy the ID for it. Use it in the commands below.</p>
+					<p>Now run these commands, replacing <code>{entry-id-here}</code> with the ID you copied earlier:</p>
+					<pre>
+						<code>
+bcdedit /set {entry-id-here} bootlog yes
+bcdedit /set {entry-id-here} bootstatuspolicy IgnoreAllFailures
+bcdedit /set {entry-id-here} novesa on
+						</code>
+					</pre>
+					<p>All of them should complete successfully. Don't reboot yet, though. Continue below, skipping to after the ESP has been mounted (the manual installation process requires you to mount the ESP).</p>
+					<h2 id="replace-system-files"><a href="#replace-system-files">Replace system files</a></h2>
+					<p>At this point, you have installed Windows 7, installed drivers, modified the registry, and changed the boot configuration. Now, you must replace some critical files on your installation's EFI system partition (ESP).</p>
+					<p>First, reboot to the BIOS and disable CSM. Now boot to a Windows 8/10 installer. Press <code>Shift-F10</code> on your keyboard to spawn a Command Prompt with root access.</p>
+					<p>ESPs are not mounted by default in Windows, whether in the installer or not, so you will have to manually mount it through DiskPart. Run these commands:</p>
+					<pre>
+						<code>
+diskpart
+list disk
+						</code>
+					</pre>
+					<p>Identify your system drive (usually disk 0). Run these commands (replace 0 in the first command with your system drive's number):</p>
+					<pre>
+						<code>
+select disk 0
+list partition
+						</code>
+					</pre>
+					<p>Identify the EFI system partion. It will be labeled as such in the output of the previous command. It's usually partition 1. Then run these commands (replace 1 in the first command with your ESP's number):</p>
+					<pre>
+						<code>
+select partition 1
+assign letter W
+						</code>
+					</pre>
+					<p>If the commands complete without issue, type <code>exit</code> and press Enter to exit DiskPart. Don't close the Command Prompt window.</p>
+					<p>Now, run these commands in your Command Prompt:</p>
+					<pre>
+						<code>
+W:
+cd EFI\Microsoft\Boot
+ren bootmgr.efi bootmgr.efi.bak
+ren bootmgfw.efi bootmgfw.efi.bak
+ren memtest.efi memtest.efi.bak
+cd Resources
+ren bootres.dll bootres.dll.bak
+cd en-US
+ren bootres.dll.mui bootres.dll.mui.bak
+cd ..\..\..\..\Boot
+ren bootx64.efi bootx64.efi.bak
+cd ..\Microsoft\Boot
+						</code>
+					</pre>
+					<p>These commands will prevent the next commands from overwriting the original files just in case. If you're 32-bit, replace "bootx64.efi" in the command with "bootia32.efi". Now run the following commands:</p>
+					<pre>
+						<code>
+copy X:\Windows\Boot\EFI\bootmgr.efi
+copy X:\Windows\Boot\EFI\bootmgfw.efi
+copy X:\Windows\Boot\memtest.efi
+copy E:\EFI\Microsoft\Boot\Fonts
+copy E:\EFI\Microsoft\Boot\Resources
+cd ..\..\Boot
+copy E:\EFI\Boot\bootx64.efi
+						</code>
+					</pre>
+					<p>If any of the commands ask you whether to continue, type "y" and press Enter. If you have a 32-bit Windows install, replace "bootx64.efi" with "bootia32.efi" in the command.</p>
+					<h2 id="done"><a href="#done">Done!</a></h2>
+					<p>That's all you need to do! Reboot your computer, remove the Windows 8/10 installer thumb drive, and Windows 7 should boot up now. However, it may sit at the boot splash screen forever. I don't know what causes this exactly.</p>
+					<p>You have just two things to remember:</p>
+					<ol>
+						<li>You can't boot in Safe Mode, it will fail to boot since it doesn't load your graphics driver (instead it will load the basic VGA driver, but that will not work).</li>
+						<li>You can't disable your graphics driver! Windows 7 will fail to boot, however, you can use "Last known good configuration" in the boot menu to boot successfully.</li>
+					</ol>
+					<h2 id="credits"><a href="#credits">Credits</a></h2>
+					<p>This method comes from a small YouTuber known as Bob Pony. His video on it can be found <a href="https://www.youtube.com/watch?v=J_QV3DqJ9Yk">here</a>.</p>
+				</section>
+			</div>
+		</div>
+	<!-- Tweet -->
+		<div id="tweet">
+			<div class="container">
+				<section>
+					<blockquote>"... whatever you wish that others would do to you, do also to them..." - Matthew 7:12</blockquote>
+				</section>
+			</div>
+		</div>
+	<!-- Footer -->
+		<div id="footer"></div>
+	<!-- Copyright -->
+	<div class="copyright">
+		Design by: <a href="https://templated.co/">Templated</a> (and modified by me)
+		Icons by <a href="https://fontawesome.com">FontAwesome</a>
+	</div>
+	</body>
+</html>
