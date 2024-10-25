@@ -212,7 +212,7 @@ section, article {
 	background-attachment: fixed;
 	background-size: cover;
 	text-align: center;
-		padding: 9em 0 7em 0;
+	padding: 9em 0 7em 0;
 }
 	#header:before {
 		content: '';
@@ -223,11 +223,6 @@ section, article {
 		height: 100%;
 		background: rgba(64, 64, 64, 0.125);
 	}
-@media only screen and (max-width: 480px) {
-	#logo {
-		padding-top: 150px;
-	}
-}
 #logo {
 	position: relative;
 	z-index: 1;
@@ -318,14 +313,58 @@ section, article {
 }
 /* Some responsiveness */
 @media only screen and (min-width: 2560px) {
-	.container {
+	#content.container {
+		max-width: 70%;
+	}
+	#tweet .container {
 		max-width: 70%;
 	}
 }
 @media only screen and (max-width: 1200px) {
-	.container {
+	#content.container {
 		max-width: 100%;
 		padding: 0.8em;
+	}
+	#tweet {
+		padding: 4em 0 !important;
+	}
+}
+@media only screen and (max-width: 960px) {
+	#header {
+		padding: 8em 0 6em 0;
+	}
+		.homepage #header {
+			padding: 12em 0 10em 0;
+		}
+	.homepage #content {
+		font-size: 1em;
+	}
+	#tweet {
+		padding: 3em 0 !important;
+	}
+		#tweet .container {
+			max-width: 95%;
+			padding: 0.8em 0;
+		}
+	#intro {
+		font-size: 1em !important;
+	}
+	#logo h1 {
+		font-size: 4em;
+	}
+}
+@media only screen and (max-width: 540px) {
+	#header {
+		padding: 7em 0 5em 0;
+	}
+		.homepage #header {
+			padding: 9em 0 7em 0;
+		}
+	#tweet {
+		padding: 2em 0 !important;
+	}
+	#tweet blockquote {
+		font-size: 1.2em !important;
 	}
 }
 /* Page footer */
@@ -391,7 +430,7 @@ section, article {
 		position: relative;
 		border: none;
 		margin: 0;
-		padding: 1em 4em;
+		padding: 1em;
 		line-height: 1.5em;
 		font-size: 1.6em;
 		font-weight: 300;
